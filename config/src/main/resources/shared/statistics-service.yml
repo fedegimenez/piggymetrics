@@ -8,6 +8,10 @@ security:
       scope: server
 
 spring:
+  # spring-cloud-security (legacy OAuth2) and spring-cloud-commons both define
+  # accessTokenContextRelay under Spring Cloud 2021.x
+  autoconfigure:
+    exclude: org.springframework.cloud.security.oauth2.client.ResourceServerTokenRelayAutoConfiguration
   data:
     mongodb:
       host: statistics-mongodb

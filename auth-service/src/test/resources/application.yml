@@ -2,4 +2,9 @@ spring:
   data:
     mongodb:
       database: piggymetrics
-      port: 0
+
+de:
+  flapdoodle:
+    mongodb:
+      embedded:
+        version: 6.0.12

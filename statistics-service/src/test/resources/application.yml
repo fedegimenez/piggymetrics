@@ -7,10 +7,19 @@ hystrix:
             timeoutInMilliseconds: 20000
 
 spring:
+  # spring-cloud-security (legacy OAuth2) and spring-cloud-commons both define
+  # accessTokenContextRelay under Spring Cloud 2021.x
+  autoconfigure:
+    exclude: org.springframework.cloud.security.oauth2.client.ResourceServerTokenRelayAutoConfiguration
   data:
     mongodb:
       database: piggymetrics
-      port: 0
 
 rates:
   url: https://api.exchangeratesapi.io
+
+de:
+  flapdoodle:
+    mongodb:
+      embedded:
+        version: 6.0.12

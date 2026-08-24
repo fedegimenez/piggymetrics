@@ -1,11 +1,10 @@
 security:
   oauth2:
     client:
-      clientId: notification-service
-      clientSecret: ${NOTIFICATION_SERVICE_PASSWORD}
-      accessTokenUri: http://auth-service:5000/uaa/oauth/token
-      grant-type: client_credentials
-      scope: server
+      client-id: notification-service
+      client-secret: ${NOTIFICATION_SERVICE_PASSWORD}
+    resource:
+      check-token-uri: http://auth-service:5000/uaa/oauth/check_token
 
 server:
   servlet:
@@ -26,6 +25,19 @@ backup:
     attachment: backup.json
 
 spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          notification-service:
+            client-id: notification-service
+            client-secret: ${NOTIFICATION_SERVICE_PASSWORD}
+            client-authentication-method: client_secret_basic
+            authorization-grant-type: client_credentials
+            scope: server
+        provider:
+          notification-service:
+            token-uri: http://auth-service:5000/uaa/oauth/token
   data:
     mongodb:
       host: notification-mongodb
