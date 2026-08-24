@@ -7,27 +7,24 @@ import com.piggymetrics.notification.domain.NotificationSettings;
 import com.piggymetrics.notification.domain.NotificationType;
 import com.piggymetrics.notification.domain.Recipient;
 import com.piggymetrics.notification.service.RecipientService;
-import com.sun.security.auth.UserPrincipal;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mockito.MockitoAnnotations;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.security.Principal;
+
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.initMocks;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
 public class RecipientControllerTest {
 
 	private static final ObjectMapper mapper = new ObjectMapper();
@@ -40,9 +37,9 @@ public class RecipientControllerTest {
 
 	private MockMvc mockMvc;
 
-	@Before
+	@BeforeEach
 	public void setup() {
-		initMocks(this);
+		MockitoAnnotations.openMocks(this);
 		this.mockMvc = MockMvcBuilders.standaloneSetup(recipientController).build();
 	}
 
@@ -52,7 +49,7 @@ public class RecipientControllerTest {
 		Recipient recipient = getStubRecipient();
 		String json = mapper.writeValueAsString(recipient);
 
-		mockMvc.perform(put("/recipients/current").principal(new UserPrincipal(recipient.getAccountName())).contentType(MediaType.APPLICATION_JSON).content(json))
+		mockMvc.perform(put("/recipients/current").principal(principal(recipient.getAccountName())).contentType(MediaType.APPLICATION_JSON).content(json))
 				.andExpect(status().isOk());
 	}
 
@@ -62,9 +59,13 @@ public class RecipientControllerTest {
 		Recipient recipient = getStubRecipient();
 		when(recipientService.findByAccountName(recipient.getAccountName())).thenReturn(recipient);
 
-		mockMvc.perform(get("/recipients/current").principal(new UserPrincipal(recipient.getAccountName())))
+		mockMvc.perform(get("/recipients/current").principal(principal(recipient.getAccountName())))
 				.andExpect(jsonPath("$.accountName").value(recipient.getAccountName()))
 				.andExpect(status().isOk());
+	}
+
+	private Principal principal(String name) {
+		return () -> name;
 	}
 
 	private Recipient getStubRecipient() {

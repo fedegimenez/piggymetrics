@@ -12,6 +12,26 @@ backup:
     attachment: backup.json
 
 spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          notification-service:
+            client-id: notification-service
+            client-secret: test
+            authorization-grant-type: client_credentials
+            scope: server
+        provider:
+          notification-service:
+            token-uri: http://localhost:5000/uaa/oauth/token
+      resourceserver:
+        opaquetoken:
+          introspection-uri: http://localhost:5000/uaa/oauth/check_token
+          client-id: notification-service
+          client-secret: test
+  mongodb:
+    embedded:
+      version: 6.0.2
   data:
     mongodb:
       database: piggymetrics
