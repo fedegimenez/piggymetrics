@@ -17,6 +17,11 @@
 	</parent>
 
 	<dependencies>
+		<!-- Spring Cloud 2021.x needs this to keep honouring bootstrap.yml -->
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-bootstrap</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-config</artifactId>

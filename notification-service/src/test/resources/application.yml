@@ -11,11 +11,39 @@ backup:
     subject: PiggyMetrics account backup
     attachment: backup.json
 
+security:
+  oauth2:
+    client:
+      client-id: notification-service
+      client-secret: test
+    resource:
+      check-token-uri: http://localhost:5000/uaa/oauth/check_token
+
+de:
+  flapdoodle:
+    mongodb:
+      embedded:
+        version: 6.0.12
+
 spring:
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.mongo.embedded.EmbeddedMongoAutoConfiguration
+  security:
+    oauth2:
+      client:
+        registration:
+          notification-service:
+            client-id: notification-service
+            client-secret: test
+            client-authentication-method: client_secret_basic
+            authorization-grant-type: client_credentials
+            scope: server
+        provider:
+          notification-service:
+            token-uri: http://localhost:5000/uaa/oauth/token
   data:
     mongodb:
       database: piggymetrics
-      port: 0
   mail:
     host: smtp.gmail.com
     port: 465

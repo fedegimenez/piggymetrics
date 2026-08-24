@@ -4,8 +4,8 @@ import com.google.common.collect.ImmutableList;
 import com.piggymetrics.notification.client.AccountServiceClient;
 import com.piggymetrics.notification.domain.NotificationType;
 import com.piggymetrics.notification.domain.Recipient;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
@@ -13,7 +13,7 @@ import javax.mail.MessagingException;
 import java.io.IOException;
 
 import static org.mockito.Mockito.*;
-import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.MockitoAnnotations.openMocks;
 
 public class NotificationServiceImplTest {
 
@@ -29,9 +29,9 @@ public class NotificationServiceImplTest {
 	@Mock
 	private EmailService emailService;
 
-	@Before
+	@BeforeEach
 	public void setup() {
-		initMocks(this);
+		openMocks(this);
 	}
 
 	@Test

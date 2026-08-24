@@ -16,6 +16,21 @@
 	</parent>
 
 	<dependencies>
+		<!-- Spring Cloud 2021.x needs this to keep honouring bootstrap.yml -->
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-bootstrap</artifactId>
+		</dependency>
+		<!-- these modules still use JUnit 4; Spring Boot 2.7 no longer ships it by default -->
+		<dependency>
+			<groupId>org.junit.vintage</groupId>
+			<artifactId>junit-vintage-engine</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-validation</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
@@ -71,10 +86,25 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<!-- flapdoodle 4.x, the 3.x line managed by Spring Boot 2.7 only knows MongoDB
+		     distributions that are not available for recent Linux/JDK 17 images -->
+		<dependency>
+			<groupId>de.flapdoodle.embed</groupId>
+			<artifactId>de.flapdoodle.embed.mongo.spring27x</artifactId>
+			<version>4.20.0</version>
+			<scope>test</scope>
+		</dependency>
 		<dependency>
 			<groupId>de.flapdoodle.embed</groupId>
 			<artifactId>de.flapdoodle.embed.mongo</artifactId>
-			<version>1.50.3</version>
+			<version>4.20.0</version>
+			<scope>test</scope>
+		</dependency>
+		<!-- flapdoodle 4.x needs BoundedInputStream.builder(), added in commons-io 2.16 -->
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.16.1</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -97,7 +127,7 @@
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>0.7.6.201602180812</version>
+				<version>0.8.12</version>
 				<executions>
 					<execution>
 						<goals>

@@ -1,4 +1,4 @@
-FROM java:8-jre
+FROM eclipse-temurin:17-jre
 MAINTAINER Alexander Lukyanchikov <sqshq@sqshq.com>
 
 ADD ./target/notification-service.jar /app/
