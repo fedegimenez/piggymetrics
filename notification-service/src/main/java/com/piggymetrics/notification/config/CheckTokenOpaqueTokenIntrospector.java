@@ -16,11 +16,14 @@ import org.springframework.security.oauth2.server.resource.introspection.OAuth2I
 import org.springframework.security.oauth2.server.resource.introspection.OpaqueTokenIntrospector;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -35,6 +38,7 @@ public class CheckTokenOpaqueTokenIntrospector implements OpaqueTokenIntrospecto
 	private static final String CLIENT_ID_CLAIM = "client_id";
 	private static final String SCOPE_CLAIM = "scope";
 	private static final String AUTHORITY_PREFIX = "SCOPE_";
+	private static final List<String> TIMESTAMP_CLAIMS = List.of("exp", "iat", "nbf");
 
 	private final String introspectionUri;
 	private final RestTemplate restTemplate;
@@ -61,6 +65,8 @@ public class CheckTokenOpaqueTokenIntrospector implements OpaqueTokenIntrospecto
 			claims = restTemplate.exchange(introspectionUri, HttpMethod.POST, new HttpEntity<>(body, headers),
 					new ParameterizedTypeReference<Map<String, Object>>() {
 					}).getBody();
+		} catch (HttpClientErrorException.BadRequest e) {
+			throw new BadOpaqueTokenException("Provided token is not active", e);
 		} catch (RestClientException e) {
 			throw new OAuth2IntrospectionException("Unable to introspect token", e);
 		}
@@ -69,7 +75,31 @@ public class CheckTokenOpaqueTokenIntrospector implements OpaqueTokenIntrospecto
 			throw new BadOpaqueTokenException("Provided token is not active");
 		}
 
-		return new DefaultOAuth2AuthenticatedPrincipal(principalName(claims), claims, authorities(claims));
+		Map<String, Object> normalized = normalize(claims);
+		return new DefaultOAuth2AuthenticatedPrincipal(principalName(normalized), normalized, authorities(normalized));
+	}
+
+	/**
+	 * check_token returns the timestamp claims as epoch seconds, while the resource server casts
+	 * them to {@link Instant} when it builds the authentication.
+	 */
+	private Map<String, Object> normalize(Map<String, Object> claims) {
+
+		Map<String, Object> normalized = new LinkedHashMap<>(claims);
+
+		TIMESTAMP_CLAIMS.forEach(claim -> {
+			Object value = normalized.get(claim);
+			if (value instanceof Number) {
+				normalized.put(claim, Instant.ofEpochSecond(((Number) value).longValue()));
+			}
+		});
+
+		Object audience = normalized.get("aud");
+		if (audience instanceof String) {
+			normalized.put("aud", List.of(audience));
+		}
+
+		return normalized;
 	}
 
 	private String principalName(Map<String, Object> claims) {
